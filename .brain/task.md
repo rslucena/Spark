@@ -1,13 +1,18 @@
-# Current Active Task: Phase 1: Bootstrap & Foundation
+# Current Active Task: Phase 4: Auto-Git Sync (Rust / git2)
 
 **Objective:**
-Initialize the Spark application using Tauri v2, React, TypeScript, and Vite, and setup basic UI configuration.
+Integrate the `git2` Rust crate to manage the "SparkVault" folder as a Git repository. Provide Tauri commands to allow the frontend to commit and push changes, establishing the "Auto-Git Sync" feature.
 
 **Requirements:**
-- [x] Bootstrap Tauri v2 using Bun
-- [x] Configure Tailwind CSS
-- [x] Add Framer Motion
-- [x] Setup UI Architecture (`src/components`, `src/hooks`, `src/utils`, `src/layouts`)
-- [x] Create Basic Layout (Split-pane layout: Sidebar + Main Editor Area)
+- [ ] Add the `git2` crate to `src-tauri/Cargo.toml`.
+- [ ] Write Rust functions (Tauri commands) for:
+  - `git_init` or checking if a repo exists.
+  - `git_status`: Check for changes.
+  - `git_add`: Stage modified files.
+  - `git_commit`: Create a timestamped commit.
+  - `git_push`: Push changes to remote.
+  - `git_pull`: Fetch and merge changes from remote.
+- [ ] Ensure the frontend can interact with these commands, creating a seamless sync experience for the user.
+- [ ] Handle potential errors (e.g., no remote configured, merge conflicts) gracefully.
 
-**Status:** DONE
+**Status:** IN PROGRESS

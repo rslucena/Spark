@@ -1,60 +1,110 @@
-import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { useState, useEffect, useCallback } from "react";
 import { MainLayout } from "./layouts/MainLayout";
+import { MarkdownEditor } from "./components/Editor/Editor";
 import { motion } from "framer-motion";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { documentDir, join } from "@tauri-apps/api/path";
+
+const INITIAL_CONTENT = `# Welcome to Spark
+A local-first knowledge management application.
+
+## Features
+- **Local-First**: Your data lives on your machine.
+- **Git Sync**: Automatically synchronize with your git repositories.
+- **Markdown**: Use standard Markdown syntax.
+
+> "Knowledge is power."
+
+### Getting Started
+Select a file from the sidebar or start typing here to create a new document.
+`;
+
+// Simple debounce utility
+function useDebounce<T extends (...args: any[]) => void>(
+  callback: T,
+  delay: number
+) {
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      const newTimeoutId = setTimeout(() => {
+        callback(...args);
+      }, delay);
+      setTimeoutId(newTimeoutId);
+    },
+    [callback, delay, timeoutId]
+  );
+}
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [activeFile, setActiveFile] = useState<string | null>(null);
+  const [content, setContent] = useState(INITIAL_CONTENT);
+  const [vaultPath, setVaultPath] = useState<string>("");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    async function initVaultPath() {
+      try {
+        const docs = await documentDir();
+        setVaultPath(await join(docs, "SparkVault"));
+      } catch (err) {
+        console.error("Failed to get document directory:", err);
+      }
+    }
+    initVaultPath();
+  }, []);
+
+  const handleFileSelect = async (fileName: string) => {
+    try {
+      if (!vaultPath) return;
+      const fullPath = await join(vaultPath, fileName);
+      const fileContent = await readTextFile(fullPath);
+      setActiveFile(fileName);
+      setContent(fileContent);
+    } catch (err) {
+      console.error("Failed to read file:", err);
+    }
+  };
+
+  const saveFile = async (markdown: string, fileName: string | null) => {
+    if (!fileName || !vaultPath) return;
+    try {
+      const fullPath = await join(vaultPath, fileName);
+      await writeTextFile(fullPath, markdown);
+      console.log(`Saved ${fileName}`);
+    } catch (err) {
+      console.error("Failed to save file:", err);
+    }
+  };
+
+  const debouncedSave = useDebounce(saveFile, 1000);
+
+  const handleEditorChange = (markdown: string) => {
+    setContent(markdown);
+    if (activeFile) {
+      debouncedSave(markdown, activeFile);
+    }
+  };
 
   return (
-    <MainLayout>
+    <MainLayout onFileSelect={handleFileSelect} activeFilePath={activeFile}>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        key={activeFile || "welcome"}
+        initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-2xl mx-auto flex flex-col items-center justify-center space-y-8 mt-12"
+        transition={{ duration: 0.3 }}
+        className="w-full h-full max-w-4xl mx-auto mt-4"
       >
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-white">Welcome to Spark</h1>
-          <p className="text-neutral-400">Local-First Knowledge Management</p>
+        <div className="mb-4 text-sm text-neutral-500">
+          {activeFile ? `Editing: ${activeFile}` : "Welcome Document (Not Saved)"}
         </div>
-
-        <form
-          className="flex space-x-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            greet();
-          }}
-        >
-          <input
-            id="greet-input"
-            className="px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-neutral-500"
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Enter a name..."
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-md transition-colors"
-          >
-            Greet
-          </button>
-        </form>
-
-        {greetMsg && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-lg font-medium text-green-400"
-          >
-            {greetMsg}
-          </motion.p>
-        )}
+        <MarkdownEditor
+          initialContent={content}
+          onChange={handleEditorChange}
+        />
       </motion.div>
     </MainLayout>
   );
