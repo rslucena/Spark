@@ -1,13 +1,13 @@
-# Current Active Task: Project Bootstrap and Documentation Setup
+# Current Active Task: Phase 1: Bootstrap & Foundation
 
 **Objective:**
-Initialize the Spark project's core planning and documentation architecture to support future daily operations via an automated scheduler.
+Initialize the Spark application using Tauri v2, React, TypeScript, and Vite, and setup basic UI configuration.
 
 **Requirements:**
-- Set up the conversation brain directory (`.brain/`).
-- Create a future task backlog (`.brain/pending_tasks.md`).
-- Define the `implementation_plan.md` outlining the overarching goals of building a Local-First Tauri v2 + React application.
-- Choose Tiptap for the WYSIWYG Markdown editor.
-- Update the operational workflow to ensure the agent reads project rules, demands, and `pending_tasks.md` daily.
+- [x] Bootstrap Tauri v2 using Bun
+- [x] Configure Tailwind CSS
+- [x] Add Framer Motion
+- [x] Setup UI Architecture (`src/components`, `src/hooks`, `src/utils`, `src/layouts`)
+- [x] Create Basic Layout (Split-pane layout: Sidebar + Main Editor Area)
 
-**Status:** IN PROGRESS
+**Status:** DONE
