@@ -26,10 +26,10 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 
 ## 📂 Phase 3: Local File System (Tauri FS)
 
-- [ ] **3.1 FS Setup:** Enable `fs` and `path` plugins in `src-tauri/tauri.conf.json`.
-- [ ] **3.2 Directory Navigation:** Implement a Tauri command to list `.md` files in a chosen base directory (the "Vault").
-- [ ] **3.3 Sidebar Render:** Display the directory contents in the React Sidebar layout.
-- [ ] **3.4 File I/O Bindings:** Create functions to read the contents of an active file into Tiptap, and save changes back to the filesystem on "debounce" or explicit save.
+- [x] **3.1 FS Setup:** Enable `fs` and `path` plugins in `src-tauri/tauri.conf.json`.
+- [x] **3.2 Directory Navigation:** Implement a Tauri command to list `.md` files in a chosen base directory (the "Vault").
+- [x] **3.3 Sidebar Render:** Display the directory contents in the React Sidebar layout.
+- [x] **3.4 File I/O Bindings:** Create functions to read the contents of an active file into Tiptap, and save changes back to the filesystem on "debounce" or explicit save.
 
 ## 🔄 Phase 4: Auto-Git Sync (Rust / git2)
 

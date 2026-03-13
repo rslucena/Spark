@@ -1,12 +1,13 @@
-# Current Active Task: Phase 2: Core Editor Integration (Tiptap)
+# Current Active Task: Phase 3: Local File System (Tauri FS)
 
 **Objective:**
-Integrate the Tiptap WYSIWYG editor into the Spark application, supporting basic Markdown formatting and a custom toolbar UI.
+Integrate Tauri FS and Path plugins to read and write local markdown files, creating a "Vault" file explorer in the sidebar.
 
 **Requirements:**
-- [x] Install Tiptap Core dependencies (`@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`).
-- [x] Implement Tiptap Editor main component.
-- [x] Add Markdown parsing extension for reading and saving content as standard Markdown text.
-- [x] Create a Toolbar UI with buttons for bold, italic, headings, lists, and quotes.
+- [x] Enable `fs`, `os` and `dialog` plugins.
+- [x] Implement a Tauri command or frontend API call to list `.md` files in a chosen base directory (the "Vault").
+- [x] Display the directory contents in the React Sidebar layout.
+- [x] Create functions to read the contents of an active file into Tiptap, and save changes back to the filesystem on "debounce" or explicit save.
+- [ ] *NOTE:* Validate the file system integration inside the native Tauri context (`bun run tauri dev`), as pure browser environments cannot execute the native IPC calls.
 
 **Status:** DONE
