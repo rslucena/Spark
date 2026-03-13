@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { readDir, exists, mkdir } from "@tauri-apps/plugin-fs";
 import { documentDir, join } from "@tauri-apps/api/path";
-import { FileText, Folder, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
+import { FileText, Folder, RefreshCw, CheckCircle2, AlertCircle, Settings } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
+import { SettingsModal, getSyncSettings } from "./SettingsModal";
 
 interface FileEntry {
   name: string;
@@ -21,6 +22,7 @@ export function Sidebar({ onFileSelect, activeFilePath }: SidebarProps) {
   const [error, setError] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
   const [syncMessage, setSyncMessage] = useState<string>("");
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     async function initVault() {
@@ -72,11 +74,32 @@ export function Sidebar({ onFileSelect, activeFilePath }: SidebarProps) {
         // We have changes, let's commit them
         setSyncMessage("Committing changes...");
         const commitMsg = `Auto-sync: ${new Date().toLocaleString()}`;
-        await invoke("git_commit", { repoPath: vaultPath, message: commitMsg });
+        const config = getSyncSettings();
 
-        setSyncStatus("success");
-        setSyncMessage("Changes saved");
+        await invoke("git_commit", {
+          repoPath: vaultPath,
+          message: commitMsg,
+          authorName: config.authorName || "Spark User",
+          authorEmail: config.authorEmail || "user@spark.local"
+        });
       }
+
+      // After committing (or if already clean), attempt to push if configured
+      const config = getSyncSettings();
+      if (config.remoteUrl && config.pat) {
+        setSyncMessage("Pushing to remote...");
+        await invoke("git_push", {
+          repoPath: vaultPath,
+          remoteUrl: config.remoteUrl,
+          pat: config.pat
+        });
+        setSyncStatus("success");
+        setSyncMessage("Synced to remote");
+      } else {
+        setSyncStatus("success");
+        setSyncMessage("Changes saved locally");
+      }
+
     } catch (err: any) {
       console.error("Sync error:", err);
       setSyncStatus("error");
@@ -119,14 +142,23 @@ export function Sidebar({ onFileSelect, activeFilePath }: SidebarProps) {
     <aside className="w-64 border-r border-neutral-800 bg-neutral-950 flex flex-col">
       <div className="p-4 border-b border-neutral-800 flex items-center justify-between group">
         <h2 className="text-sm font-semibold tracking-wider text-neutral-400 uppercase">Spark Vault</h2>
-        <button
-          onClick={handleSync}
-          disabled={syncStatus === "syncing" || !vaultPath}
-          className="text-neutral-500 hover:text-white transition-colors disabled:opacity-50"
-          title="Sync Vault"
-        >
-          <RefreshCw size={16} className={syncStatus === "syncing" ? "animate-spin text-blue-400" : ""} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="text-neutral-500 hover:text-white transition-colors"
+            title="Settings"
+          >
+            <Settings size={16} />
+          </button>
+          <button
+            onClick={handleSync}
+            disabled={syncStatus === "syncing" || !vaultPath}
+            className="text-neutral-500 hover:text-white transition-colors disabled:opacity-50"
+            title="Sync Vault"
+          >
+            <RefreshCw size={16} className={syncStatus === "syncing" ? "animate-spin text-blue-400" : ""} />
+          </button>
+        </div>
       </div>
 
       {syncStatus !== "idle" && (
@@ -171,6 +203,11 @@ export function Sidebar({ onFileSelect, activeFilePath }: SidebarProps) {
           </ul>
         )}
       </div>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </aside>
   );
 }

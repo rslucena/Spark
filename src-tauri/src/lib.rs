@@ -1,4 +1,4 @@
-use git2::{Repository, Signature};
+use git2::{Repository, Signature, Cred, RemoteCallbacks, FetchOptions, PushOptions};
 use std::path::Path;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -46,7 +46,7 @@ fn git_status(repo_path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn git_commit(repo_path: String, message: String) -> Result<String, String> {
+fn git_commit(repo_path: String, message: String, author_name: String, author_email: String) -> Result<String, String> {
     let repo = Repository::open(&repo_path).map_err(|e| format!("Failed to open repository: {}", e))?;
 
     // Stage all changes
@@ -58,8 +58,7 @@ fn git_commit(repo_path: String, message: String) -> Result<String, String> {
     let tree_id = index.write_tree().map_err(|e| format!("Failed to write tree: {}", e))?;
     let tree = repo.find_tree(tree_id).map_err(|e| format!("Failed to find tree: {}", e))?;
 
-    // Use a default signature for now (in a real app, this should come from config)
-    let sig = Signature::now("Spark User", "user@spark.local").map_err(|e| format!("Failed to create signature: {}", e))?;
+    let sig = Signature::now(&author_name, &author_email).map_err(|e| format!("Failed to create signature: {}", e))?;
 
     // Determine the parent commit
     let parent_commit = match repo.head() {
@@ -88,6 +87,46 @@ fn git_commit(repo_path: String, message: String) -> Result<String, String> {
     Ok("Commit successful".to_string())
 }
 
+#[tauri::command]
+fn git_push(repo_path: String, remote_url: String, pat: String) -> Result<String, String> {
+    if remote_url.is_empty() {
+        return Ok("No remote configured, skipping push.".to_string());
+    }
+
+    let repo = Repository::open(&repo_path).map_err(|e| format!("Failed to open repository: {}", e))?;
+
+    // Set up or get the remote
+    let mut remote = match repo.find_remote("origin") {
+        Ok(r) => {
+            if r.url() != Some(&remote_url) {
+                repo.remote_set_url("origin", &remote_url).map_err(|e| format!("Failed to set remote url: {}", e))?;
+                repo.find_remote("origin").map_err(|e| format!("Failed to find remote after setting url: {}", e))?
+            } else {
+                r
+            }
+        },
+        Err(_) => {
+            repo.remote("origin", &remote_url).map_err(|e| format!("Failed to create remote: {}", e))?
+        }
+    };
+
+    let mut callbacks = RemoteCallbacks::new();
+    callbacks.credentials(move |_url, _username_from_url, _allowed_types| {
+        // Use PAT as a token
+        Cred::userpass_plaintext("token", &pat)
+    });
+
+    let mut push_options = PushOptions::new();
+    push_options.remote_callbacks(callbacks);
+
+    // Push HEAD to main/master (using refs/heads/main as default)
+    let refspec = "refs/heads/main:refs/heads/main";
+    match remote.push(&[refspec], Some(&mut push_options)) {
+        Ok(_) => Ok("Push successful".to_string()),
+        Err(e) => Err(format!("Failed to push: {}", e)),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -99,7 +138,8 @@ pub fn run() {
             greet,
             git_init,
             git_status,
-            git_commit
+            git_commit,
+            git_push
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

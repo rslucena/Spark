@@ -19,9 +19,9 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 
 ## ✍️ Phase 2: Core Editor Integration (Tiptap)
 
-- [ ] **2.1 Install Tiptap Core:** Install `@tiptap/react`, `@tiptap/pm`, and `@tiptap/starter-kit`.
+- [x] **2.1 Install Tiptap Core:** Install `@tiptap/react`, `@tiptap/pm`, and `@tiptap/starter-kit`.
 - [x] **2.2 Implement Tiptap Editor:** Create the main `Editor` component that renders a WYSIWYG surface.
-- [ ] **2.3 Markdown Parsing:** Install `@tiptap/extension-markdown` (or a similar markdown serialization utility) so that content is saved as standard Markdown text.
+- [x] **2.3 Markdown Parsing:** Install `tiptap-markdown` so that content is saved as standard Markdown text.
 - [x] **2.4 Toolbar UI:** Create a sticky toolbar with buttons for bold, italic, headings, lists, and quotes.
 
 ## 📂 Phase 3: Local File System (Tauri FS)
@@ -33,14 +33,14 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 
 ## 🔄 Phase 4: Auto-Git Sync (Rust / git2)
 
-- [ ] **4.1 Add git2 Dependency:** Add the `git2` crate to `src-tauri/Cargo.toml`.
-- [ ] **4.2 Git Commands Setup:** Write Rust functions (Tauri commands) for:
+- [x] **4.1 Add git2 Dependency:** Add the `git2` crate to `src-tauri/Cargo.toml`.
+- [x] **4.2 Git Commands Setup:** Write Rust functions (Tauri commands) for:
   - `git_status`: Check for changes.
-  - `git_add`: Stage modified files.
-  - `git_commit`: Create a timestamped commit.
+  - `git_commit`: Create a timestamped commit (includes staging).
+- [ ] **4.3 Remote Sync Setup:** Write Rust functions for:
   - `git_push`: Push changes to remote.
   - `git_pull`: Fetch and merge changes from remote.
-- [ ] **4.3 Lifecycle Hooks:** Call `git_pull` securely on application start. Create a background worker or an on-close hook to trigger a commit/push.
+- [ ] **4.4 Lifecycle Hooks:** Call `git_pull` securely on application start. Create a background worker or an on-close hook to trigger a commit/push.
 
 ## ✨ Phase 5: UI/UX Polish
 
