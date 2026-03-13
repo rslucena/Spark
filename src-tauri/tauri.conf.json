@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "tmp_tauri",
+  "productName": "spark",
   "version": "0.1.0",
   "identifier": "com.jules.spark",
   "build": {
@@ -12,9 +12,10 @@
   "app": {
     "windows": [
       {
-        "title": "tmp_tauri",
-        "width": 800,
-        "height": 600
+        "title": "Spark",
+        "width": 1200,
+        "height": 800,
+        "center": true
       }
     ],
     "security": {

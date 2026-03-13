@@ -11,23 +11,31 @@
     "dialog:default",
     {
       "identifier": "fs:allow-read-dir",
-      "allow": [{ "path": "$DOCUMENT/**" }]
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
     },
     {
       "identifier": "fs:allow-read-file",
-      "allow": [{ "path": "$DOCUMENT/**" }]
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
     },
     {
       "identifier": "fs:allow-write-file",
-      "allow": [{ "path": "$DOCUMENT/**" }]
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
     },
     {
       "identifier": "fs:allow-mkdir",
-      "allow": [{ "path": "$DOCUMENT/**" }]
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
     },
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$DOCUMENT/**" }]
+      "allow": [{ "path": "$DOCUMENT/**" }, { "path": "/home/lucena/Área de trabalho/Codes/Spark/**" }]
     }
   ]
 }

@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    tmp_tauri_lib::run()
+    spark_lib::run()
 }
