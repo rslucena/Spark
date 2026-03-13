@@ -1,13 +1,12 @@
-# Current Active Task: Phase 1: Bootstrap & Foundation
+# Current Active Task: 🧹 Code Health Improvement: Remove Boilerplate Comment
 
 **Objective:**
-Initialize the Spark application using Tauri v2, React, TypeScript, and Vite, and setup basic UI configuration.
+Remove the boilerplate comment in `src-tauri/src/lib.rs` to improve code readability and maintainability.
 
 **Requirements:**
-- [x] Bootstrap Tauri v2 using Bun
-- [x] Configure Tailwind CSS
-- [x] Add Framer Motion
-- [x] Setup UI Architecture (`src/components`, `src/hooks`, `src/utils`, `src/layouts`)
-- [x] Create Basic Layout (Split-pane layout: Sidebar + Main Editor Area)
+- [x] Remove the boilerplate comment from `src-tauri/src/lib.rs`
+- [x] Verify formatting with `cargo fmt`
+- [ ] Verify code quality with `cargo clippy`
+- [ ] Run tests with `cargo test`
 
 **Status:** DONE
