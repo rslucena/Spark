@@ -9,6 +9,10 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 
 ---
 
+## 🛡️ Security & Maintenance
+
+- [x] **SEC-1 Enable Content Security Policy:** Replace `csp: null` with a restrictive policy in `tauri.conf.json`.
+
 ## 🛠️ Phase 1: Bootstrap & Foundation
 
 - [x] **1.1 Bootstrap Tauri v2:** Create the core structure using `npm create tauri-app@latest`. Choose React, TypeScript, and Vite.
