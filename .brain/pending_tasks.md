@@ -11,11 +11,11 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 
 ## 🛠️ Phase 1: Bootstrap & Foundation
 
-- [ ] **1.1 Bootstrap Tauri v2:** Create the core structure using `npm create tauri-app@latest`. Choose React, TypeScript, and Vite.
-- [ ] **1.2 Configure Tailwind CSS:** Install Tailwind CSS, PostCSS, and Autoprefixer. Configure `tailwind.config.js` and add base styles to `src/index.css`.
-- [ ] **1.3 Add Framer Motion:** Install `framer-motion` for React micro-interactions.
-- [ ] **1.4 UI Architecture Setup:** Create folders: `src/components`, `src/hooks`, `src/utils`, `src/layouts`.
-- [ ] **1.5 Basic Layout:** Create a split-pane layout (Sidebar + Main Editor Area) using Tailwind flexbox/grid.
+- [x] **1.1 Bootstrap Tauri v2:** Create the core structure using `npm create tauri-app@latest`. Choose React, TypeScript, and Vite.
+- [x] **1.2 Configure Tailwind CSS:** Install Tailwind CSS, PostCSS, and Autoprefixer. Configure `tailwind.config.js` and add base styles to `src/index.css`.
+- [x] **1.3 Add Framer Motion:** Install `framer-motion` for React micro-interactions.
+- [x] **1.4 UI Architecture Setup:** Create folders: `src/components`, `src/hooks`, `src/utils`, `src/layouts`.
+- [x] **1.5 Basic Layout:** Create a split-pane layout (Sidebar + Main Editor Area) using Tailwind flexbox/grid.
 
 ## ✍️ Phase 2: Core Editor Integration (Tiptap)
 
