@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { MainLayout } from "./layouts/MainLayout";
 import { MarkdownEditor } from "./components/Editor/Editor";
 import { motion } from "framer-motion";
@@ -13,6 +13,15 @@ import { invoke } from "@tauri-apps/api/core";
 import { SyncOverlay } from "./components/SyncOverlay";
 import { resolveInternalLink } from "./utils/linkResolver";
 import { getSyncSettings } from "./components/SettingsModal";
+import Fuse from "fuse.js";
+import { SearchResultsView } from "./components/SearchResultsView";
+
+interface FileEntry {
+  name: string;
+  path: string;
+  isDirectory: boolean;
+  content?: string;
+}
 
 const INITIAL_CONTENT = `# Welcome to Spark
 A local-first knowledge management application.
@@ -55,6 +64,8 @@ function App() {
   const [metadata, setMetadata] = useState<FileMetadata>({ title: "", description: "" });
   const [vaultPath, setVaultPath] = useState<string>("");
   const [isCommitModalOpen, setIsCommitModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchIndex, setSearchIndex] = useState<FileEntry[]>([]);
 
   const { performSync, syncStatus, syncMessage, isSyncingOverlay } = useSync();
 
@@ -72,7 +83,25 @@ function App() {
       }
     }
     initVaultPath();
-  }, []);
+  }, [vaultPath]);
+
+  const fuse = useMemo(() => {
+    return new Fuse(searchIndex, {
+      keys: [
+        { name: "name", weight: 0.7 },
+        { name: "content", weight: 0.3 },
+        { name: "path", weight: 0.1 }
+      ],
+      threshold: 0.4,
+      ignoreLocation: true,
+      includeMatches: true
+    });
+  }, [searchIndex]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    return fuse.search(searchQuery).map(result => result.item);
+  }, [searchQuery, fuse]);
 
   const handleFileSelect = async (fileName: string) => {
     console.log("File selected:", fileName);
@@ -190,6 +219,9 @@ function App() {
       onSync={performSync}
       syncStatus={syncStatus}
       syncMessage={syncMessage}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      onFilesLoaded={setSearchIndex}
       rightSidePanel={
         <MetadataPanel 
           metadata={metadata} 
@@ -200,29 +232,40 @@ function App() {
         />
       }
     >
-      <motion.div
-        key={activeFile || "welcome"}
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full h-full max-w-4xl mx-auto mt-4 px-8"
-      >
-        {!isTauri() && (
-          <div className="bg-blue-900/40 border border-blue-500/50 text-blue-200 px-4 py-2 rounded-md mb-4 text-xs font-medium flex items-center justify-between">
-            <span>Running in Browser Mode (Simulation)</span>
-            <span className="opacity-70">Changes won't be saved to disk</span>
-          </div>
-        )}
-        <div className="mb-4 text-sm text-neutral-500 flex items-center gap-2">
-          <FileMetadataIcon activeFile={activeFile} />
-          {activeFile ? activeFile : "Welcome Document (Not Saved)"}
-        </div>
-        <MarkdownEditor
-          initialContent={content}
-          onChange={handleEditorChange}
-          onLinkClick={handleLinkClick}
+      {searchQuery ? (
+        <SearchResultsView 
+          query={searchQuery}
+          results={searchResults}
+          onFileSelect={(path: string) => {
+            handleFileSelect(path);
+            setSearchQuery("");
+          }}
         />
-      </motion.div>
+      ) : (
+        <motion.div
+          key={activeFile || "welcome"}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full h-full max-w-4xl mx-auto mt-4 px-8"
+        >
+          {!isTauri() && (
+            <div className="bg-blue-900/40 border border-blue-500/50 text-blue-200 px-4 py-2 rounded-md mb-4 text-xs font-medium flex items-center justify-between">
+              <span>Running in Browser Mode (Simulation)</span>
+              <span className="opacity-70">Changes won't be saved to disk</span>
+            </div>
+          )}
+          <div className="mb-4 text-sm text-neutral-500 flex items-center gap-2">
+            <FileMetadataIcon activeFile={activeFile} />
+            {activeFile ? activeFile : "Welcome Document (Not Saved)"}
+          </div>
+          <MarkdownEditor
+            initialContent={content}
+            onChange={handleEditorChange}
+            onLinkClick={handleLinkClick}
+          />
+        </motion.div>
+      )}
 
       <SyncCommitModal 
         isOpen={isCommitModalOpen}

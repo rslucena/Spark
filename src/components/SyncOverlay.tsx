@@ -1,4 +1,4 @@
-import { Loader2, Github } from "lucide-react";
+import { Loader2, Brain } from "lucide-react";
 
 interface SyncOverlayProps {
   isVisible: boolean;
@@ -23,7 +23,7 @@ export function SyncOverlay({ isVisible, message }: SyncOverlayProps) {
                 <div className="relative mb-6">
                     <div className="absolute inset-0 bg-blue-500/30 blur-xl rounded-full" />
                     <div className="bg-gradient-to-br from-blue-600 to-blue-400 p-5 rounded-3xl shadow-lg relative z-10">
-                        <Github className="text-white w-10 h-10 animate-pulse" />
+                        <Brain className="text-white w-10 h-10 animate-pulse" />
                     </div>
                 </div>
                 

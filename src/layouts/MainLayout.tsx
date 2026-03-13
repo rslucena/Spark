@@ -9,7 +9,10 @@ export function MainLayout({
   rightSidePanel,
   onSync,
   syncStatus,
-  syncMessage
+  syncMessage,
+  searchQuery,
+  onSearchChange,
+  onFilesLoaded
 }: {
   children: React.ReactNode;
   onFileSelect?: (path: string) => void;
@@ -22,6 +25,9 @@ export function MainLayout({
   }) => Promise<void>;
   syncStatus?: SyncStatus;
   syncMessage?: string;
+  searchQuery?: string;
+  onSearchChange?: (val: string) => void;
+  onFilesLoaded?: (files: any[]) => void;
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(260);
   const [metadataWidth, setMetadataWidth] = useState(320);
@@ -86,6 +92,9 @@ export function MainLayout({
           performSync={onSync}
           syncStatus={syncStatus}
           syncMessage={syncMessage}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          onFilesLoaded={onFilesLoaded}
         />
       </div>
 
