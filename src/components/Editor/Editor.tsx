@@ -16,6 +16,7 @@ export function MarkdownEditor({ initialContent = "", onChange }: EditorProps) {
     extensions: [StarterKit, Markdown],
     content: initialContent,
     onUpdate: ({ editor }) => {
+      // @ts-ignore
       const markdown = editor.storage.markdown.getMarkdown();
       setContent(markdown);
       if (onChange) {
@@ -32,6 +33,7 @@ export function MarkdownEditor({ initialContent = "", onChange }: EditorProps) {
 
   // Update editor content when initialContent changes (e.g. loading a new file)
   useEffect(() => {
+    // @ts-ignore
     if (editor && initialContent !== editor.storage.markdown.getMarkdown()) {
       editor.commands.setContent(initialContent);
     }
