@@ -20,9 +20,9 @@ This file acts as the single source of truth for the daily task scheduler. Each 
 ## ✍️ Phase 2: Core Editor Integration (Tiptap)
 
 - [ ] **2.1 Install Tiptap Core:** Install `@tiptap/react`, `@tiptap/pm`, and `@tiptap/starter-kit`.
-- [ ] **2.2 Implement Tiptap Editor:** Create the main `Editor` component that renders a WYSIWYG surface.
+- [x] **2.2 Implement Tiptap Editor:** Create the main `Editor` component that renders a WYSIWYG surface.
 - [ ] **2.3 Markdown Parsing:** Install `@tiptap/extension-markdown` (or a similar markdown serialization utility) so that content is saved as standard Markdown text.
-- [ ] **2.4 Toolbar UI:** Create a sticky toolbar with buttons for bold, italic, headings, lists, and quotes.
+- [x] **2.4 Toolbar UI:** Create a sticky toolbar with buttons for bold, italic, headings, lists, and quotes.
 
 ## 📂 Phase 3: Local File System (Tauri FS)
 

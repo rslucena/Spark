@@ -1,13 +1,12 @@
-# Current Active Task: Phase 1: Bootstrap & Foundation
+# Current Active Task: Phase 2: Core Editor Integration (Tiptap)
 
 **Objective:**
-Initialize the Spark application using Tauri v2, React, TypeScript, and Vite, and setup basic UI configuration.
+Integrate the Tiptap WYSIWYG editor into the Spark application, supporting basic Markdown formatting and a custom toolbar UI.
 
 **Requirements:**
-- [x] Bootstrap Tauri v2 using Bun
-- [x] Configure Tailwind CSS
-- [x] Add Framer Motion
-- [x] Setup UI Architecture (`src/components`, `src/hooks`, `src/utils`, `src/layouts`)
-- [x] Create Basic Layout (Split-pane layout: Sidebar + Main Editor Area)
+- [x] Install Tiptap Core dependencies (`@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`).
+- [x] Implement Tiptap Editor main component.
+- [x] Add Markdown parsing extension for reading and saving content as standard Markdown text.
+- [x] Create a Toolbar UI with buttons for bold, italic, headings, lists, and quotes.
 
 **Status:** DONE
