@@ -1,11 +1,6 @@
 use git2::{Repository, Signature, Cred, RemoteCallbacks, FetchOptions, PushOptions};
 use std::path::Path;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
 
 #[tauri::command]
 fn git_init(repo_path: String) -> Result<String, String> {
@@ -283,7 +278,6 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
-            greet,
             git_init,
             git_status,
             git_commit,
