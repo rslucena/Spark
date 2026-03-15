@@ -398,8 +398,6 @@ export function Sidebar({
 
   const { theme, setTheme } = useTheme();
 
-    setTheme(nextTheme[theme]);
-  };
 
   const ThemeIcon = () => {
     if (theme === "light") return <Sun size={14} />;

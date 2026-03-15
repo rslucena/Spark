@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Check, ChevronRight, ChevronLeft, Loader2, Folder, Github, GitBranch, AlertCircle } from "lucide-react";
+import { X, Check, Loader2, GitCommit, Settings2, Github, ChevronRight, ChevronLeft, Folder, GitBranch } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchUserRepos, fetchRepoFolders, GithubRepo, GithubContent } from "../utils/github";
 
@@ -33,6 +33,14 @@ export function getSyncSettings(): SyncSettings {
   };
 }
 
+// Mock sync history entries for the log panel
+const MOCK_HISTORY = [
+  { id: 1, type: "push", message: "Pushed 3 notes to main", time: "2m ago", success: true },
+  { id: 2, type: "pull", message: "Pulled 1 note from remote", time: "1h ago", success: true },
+  { id: 3, type: "error", message: "Merge conflict in index.md", time: "2d ago", success: false },
+  { id: 4, type: "push", message: "Initial commit", time: "1w ago", success: true },
+];
+
 export function SettingsModal({ isOpen, onClose, onSave }: SettingsModalProps) {
   const [step, setStep] = useState(1);
   const [settings, setSettings] = useState<SyncSettings>(getSyncSettings());
@@ -41,6 +49,7 @@ export function SettingsModal({ isOpen, onClose, onSave }: SettingsModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [showLog, setShowLog] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -96,6 +105,7 @@ export function SettingsModal({ isOpen, onClose, onSave }: SettingsModalProps) {
   };
 
   const handleSave = () => {
+    setLoading(true);
     localStorage.setItem("spark_remoteUrl", settings.remoteUrl);
     localStorage.setItem("spark_pat", settings.pat);
     localStorage.setItem("spark_authorName", settings.authorName);
@@ -104,241 +114,291 @@ export function SettingsModal({ isOpen, onClose, onSave }: SettingsModalProps) {
     localStorage.setItem("spark_subfolder", settings.subfolder);
     localStorage.setItem("spark_repoName", settings.repoName || "");
     localStorage.setItem("spark_repoOwner", settings.repoOwner || "");
+
     setSaved(true);
-    if (onSave) onSave();
-    setTimeout(() => onClose(), 800);
+    setLoading(false);
+
+    setTimeout(() => {
+      onSave?.();
+      onClose();
+    }, 1500);
   };
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.98, y: 10 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="relative flex w-full max-w-5xl max-h-[85vh] h-[600px] bg-[#111111] border border-[#222222] rounded-2xl shadow-2xl overflow-hidden"
+        >
+          {/* Close Button */}
+          <button
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
-          />
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] relative z-10 transition-colors"
+            className="absolute top-6 right-6 p-2 text-neutral-500 hover:text-white transition-colors z-20 bg-[#111111] rounded-full hover:bg-[#222222]"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
-              <div>
-                <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                  <Github size={24} className="text-blue-500" />
-                  Configuração de Sync
-                </h2>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-1 uppercase tracking-widest font-semibold">
-                  Passo {step} de 3: {step === 1 ? "Autenticação" : step === 2 ? "Selecionar Repositório" : "Configuração"}
-                </p>
-              </div>
-              <button onClick={onClose} className="p-2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-xl transition-all">
-                <X size={20} />
-              </button>
-            </div>
+            <X size={20} strokeWidth={1.5} />
+          </button>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-white dark:bg-neutral-900">
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm flex items-start gap-3"
-                >
-                  <AlertCircle size={20} className="flex-shrink-0" />
-                  <span>{error}</span>
-                </motion.div>
-              )}
-
-              {step === 1 && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Personal Access Token</label>
-                    <input
-                      type="password"
-                      value={settings.pat}
-                      onChange={(e) => setSettings({ ...settings, pat: e.target.value })}
-                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                      className="w-full bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 dark:focus:border-blue-500 transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-700"
-                    />
-                    <p className="text-[11px] text-neutral-500 leading-relaxed">
-                      Gere um <a href="https://github.com/settings/tokens" target="_blank" className="text-blue-500 dark:text-blue-400 hover:underline">Classic Token</a> com acesso <code>repo</code> para habilitar a sincronização.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Nome do Autor Git</label>
-                        <input
-                          type="text"
-                          value={settings.authorName}
-                          onChange={(e) => setSettings({ ...settings, authorName: e.target.value })}
-                          className="w-full bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-all"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Email do Autor</label>
-                        <input
-                          type="text"
-                          value={settings.authorEmail}
-                          onChange={(e) => setSettings({ ...settings, authorEmail: e.target.value })}
-                          className="w-full bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-all"
-                        />
-                    </div>
-                  </div>
+          {/* Left Column: Ultra-Minimalist Configuration */}
+          <div className="flex-1 flex flex-col items-center justify-center px-12 relative overflow-hidden">
+            <div className="w-full max-w-md flex flex-col items-center max-h-full py-8 custom-scrollbar">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-10 text-center shrink-0"
+              >
+                <div className="w-12 h-12 bg-[#1A1A1A] border border-[#222222] rounded-full flex items-center justify-center mx-auto mb-6">
+                   <Github size={24} className="text-white" strokeWidth={1.5} />
                 </div>
-              )}
+                <h2 className="text-3xl font-light text-white font-[Outfit] tracking-tight">GitHub Sync</h2>
+              </motion.div>
 
-              {step === 2 && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between ml-1">
-                    <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Escolha o Repositório</label>
-                    <span className="text-[10px] text-neutral-400 dark:text-neutral-600 font-mono">{repos.length} encontrados</span>
-                  </div>
-                  <div className="space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                    {repos.map((repo) => (
-                      <button
-                        key={repo.id}
-                        onClick={() => handleSelectRepo(repo)}
-                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group ${
-                          settings.repoName === repo.name 
-                          ? "bg-blue-500/10 border-blue-500 dark:border-blue-500/50 ring-1 ring-blue-500/50" 
-                          : "bg-neutral-50 dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800/40"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg ${settings.repoName === repo.name ? "bg-blue-500/20" : "bg-white dark:bg-neutral-900 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-800"}`}>
-                              <Github size={18} className={settings.repoName === repo.name ? "text-blue-600 dark:text-blue-400" : "text-neutral-400 dark:text-neutral-500"} />
-                          </div>
-                          <div>
-                              <p className={`text-sm font-semibold ${settings.repoName === repo.name ? "text-blue-600 dark:text-blue-400" : "text-neutral-900 dark:text-neutral-200"}`}>{repo.name}</p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-600">{repo.owner.login}</p>
-                          </div>
-                        </div>
-                        {settings.repoName === repo.name && <Check size={18} className="text-blue-600 dark:text-blue-400" />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="w-full space-y-8 flex-1 overflow-y-auto px-2">
+                {error && (
+                  <div className="text-red-400 text-sm font-sans text-center mb-4">{error}</div>
+                )}
 
-              {step === 3 && (
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest ml-1">Pasta das Notas</label>
-                    <div className="space-y-2">
+                {step === 1 && (
+                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={settings.authorName}
+                        onChange={(e) => setSettings({ ...settings, authorName: e.target.value })}
+                        placeholder="Git Author Name"
+                        className="w-full bg-transparent border-b border-[#222222] px-0 py-4 text-center text-lg text-white focus:outline-none focus:border-neutral-500 transition-colors font-sans placeholder:text-neutral-700 placeholder:font-light tracking-widest"
+                      />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        value={settings.authorEmail}
+                        onChange={(e) => setSettings({ ...settings, authorEmail: e.target.value })}
+                        placeholder="Git Author Email"
+                        className="w-full bg-transparent border-b border-[#222222] px-0 py-4 text-center text-lg text-white focus:outline-none focus:border-neutral-500 transition-colors font-sans placeholder:text-neutral-700 placeholder:font-light tracking-widest"
+                      />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={settings.pat}
+                        onChange={(e) => setSettings({ ...settings, pat: e.target.value })}
+                        placeholder="Personal Access Token"
+                        className="w-full bg-transparent border-b border-[#222222] px-0 py-4 text-center text-lg text-white focus:outline-none focus:border-neutral-500 transition-colors font-sans placeholder:text-neutral-700 placeholder:font-light tracking-widest"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 2 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                    <p className="text-neutral-500 text-sm text-center mb-6">Select Repository</p>
+                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                      {repos.map((repo) => (
+                        <button
+                          key={repo.id}
+                          onClick={() => handleSelectRepo(repo)}
+                          className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between group ${
+                            settings.repoName === repo.name
+                            ? "border-neutral-500 bg-[#1A1A1A]"
+                            : "border-[#222222] hover:border-neutral-700 bg-transparent hover:bg-[#141414]"
+                          }`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div>
+                                <p className={`text-sm font-light ${settings.repoName === repo.name ? "text-white" : "text-neutral-300"}`}>{repo.name}</p>
+                                <p className="text-xs text-neutral-600">{repo.owner.login}</p>
+                            </div>
+                          </div>
+                          {settings.repoName === repo.name && <Check size={18} className="text-white" />}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 3 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                     <div className="space-y-4">
+                      <p className="text-neutral-500 text-sm text-center mb-4">Target Folder & Branch</p>
+
                       <button
                         onClick={() => setSettings({ ...settings, subfolder: "" })}
                         className={`w-full text-left p-4 rounded-xl border transition-all flex items-center gap-4 ${
                           settings.subfolder === "" 
-                          ? "bg-blue-500/10 border-blue-500 dark:border-blue-500/50 ring-1 ring-blue-500/50" 
-                          : "bg-neutral-50 dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800/30"
+                          ? "border-neutral-500 bg-[#1A1A1A]"
+                          : "border-[#222222] hover:border-neutral-700 bg-transparent hover:bg-[#141414]"
                         }`}
                       >
-                        <div className={`p-2 rounded-lg ${settings.subfolder === "" ? "bg-blue-500/20" : "bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 dark:border-neutral-800"}`}>
-                          <Folder size={18} className={settings.subfolder === "" ? "text-blue-600 dark:text-blue-400" : "text-neutral-400 dark:text-neutral-500"} />
-                        </div>
+                        <Folder size={18} className={settings.subfolder === "" ? "text-white" : "text-neutral-600"} />
                         <div>
-                          <span className={`text-sm font-semibold block ${settings.subfolder === "" ? "text-blue-600 dark:text-blue-400" : "text-neutral-900 dark:text-neutral-200"}`}>Raiz do Repositório</span>
-                          <span className="text-[10px] text-neutral-500 dark:text-neutral-600 italic font-medium">Sincroniza todos os arquivos .md</span>
+                          <span className={`text-sm font-light block ${settings.subfolder === "" ? "text-white" : "text-neutral-300"}`}>Repository Root</span>
                         </div>
-                        {settings.subfolder === "" && <Check size={18} className="ml-auto text-blue-600 dark:text-blue-400" />}
+                        {settings.subfolder === "" && <Check size={18} className="ml-auto text-white" />}
                       </button>
                       
                       {folders.length > 0 && (
-                        <div className="mt-6 space-y-3">
-                          <p className="text-[10px] uppercase font-black text-neutral-400 dark:text-neutral-600 tracking-tighter ml-1 font-bold">Subdiretórios</p>
-                          <div className="grid grid-cols-1 gap-2">
+                        <div className="mt-4 space-y-2">
+                          <p className="text-[10px] uppercase text-neutral-600 tracking-widest ml-1">Subfolders</p>
+                          <div className="grid grid-cols-1 gap-2 max-h-[150px] overflow-y-auto custom-scrollbar">
                             {folders.map(folder => (
                               <button
                                 key={folder.path}
                                 onClick={() => setSettings({ ...settings, subfolder: folder.path })}
                                 className={`w-full text-left p-3 px-4 rounded-xl border transition-all flex items-center gap-4 ${
                                   settings.subfolder === folder.path 
-                                  ? "bg-blue-500/10 border-blue-500 dark:border-blue-500/50 ring-1 ring-blue-500/50" 
-                                  : "bg-neutral-50 dark:bg-neutral-950/30 border-neutral-200/60 dark:border-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800/20 hover:border-neutral-300 dark:hover:border-neutral-700"
+                                  ? "border-neutral-500 bg-[#1A1A1A]"
+                                  : "border-[#222222] hover:border-neutral-700 bg-transparent hover:bg-[#141414]"
                                 }`}
                               >
-                                <Folder size={16} className={settings.subfolder === folder.path ? "text-blue-600 dark:text-blue-400" : "text-neutral-400 dark:text-neutral-500"} />
-                                <span className={`text-sm ${settings.subfolder === folder.path ? "text-blue-600 dark:text-blue-400 font-semibold" : "text-neutral-700 dark:text-neutral-300"}`}>{folder.name}</span>
-                                {settings.subfolder === folder.path && <Check size={16} className="ml-auto text-blue-600 dark:text-blue-400" />}
+                                <Folder size={16} className={settings.subfolder === folder.path ? "text-white" : "text-neutral-600"} />
+                                <span className={`text-sm font-light ${settings.subfolder === folder.path ? "text-white" : "text-neutral-400"}`}>{folder.name}</span>
+                                {settings.subfolder === folder.path && <Check size={16} className="ml-auto text-white" />}
                               </button>
                             ))}
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
 
-                  <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800/50">
-                    <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-500 mb-3 ml-1 font-bold">
-                        <GitBranch size={16} />
-                        <span className="text-xs font-bold uppercase tracking-widest">Branch Alvo</span>
+                    <div className="pt-4 mt-4 border-t border-[#222222]">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <GitBranch size={14} className="text-neutral-600"/>
+                        <span className="text-xs text-neutral-500">Target Branch</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={settings.branch}
+                        onChange={(e) => setSettings({ ...settings, branch: e.target.value })}
+                        placeholder="main"
+                        className="w-full bg-transparent border-b border-[#222222] px-0 py-3 text-center text-sm text-white focus:outline-none focus:border-neutral-500 transition-colors font-sans placeholder:text-neutral-700"
+                      />
                     </div>
-                    <input
-                      type="text"
-                      value={settings.branch}
-                      onChange={(e) => setSettings({ ...settings, branch: e.target.value })}
-                      placeholder="main"
-                      className="w-full bg-neutral-100 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-all font-mono"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+                  </motion.div>
+                )}
+              </div>
 
-            {/* Footer */}
-            <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 flex items-center justify-between transition-colors">
-              <div>
-                {step > 1 && (
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mt-8 w-full shrink-0 flex items-center justify-between"
+              >
+                 {step > 1 && (
                   <button
                     onClick={() => setStep(step - 1)}
-                    className="px-5 py-2.5 text-sm font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 transition-all hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-xl"
+                    className="p-3 text-neutral-500 hover:text-white transition-colors rounded-full hover:bg-[#1A1A1A]"
                   >
-                    <ChevronLeft size={18} /> Voltar
+                    <ChevronLeft size={20} />
                   </button>
                 )}
-              </div>
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={onClose}
-                  className="px-5 py-2.5 text-sm font-bold text-neutral-400 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 transition-all"
-                >
-                  Cancelar
-                </button>
-                
-                {step < 3 ? (
-                  <button
-                    onClick={handleFetchRepos}
-                    disabled={loading || (step === 1 && !settings.pat)}
-                    className="bg-blue-600 hover:bg-blue-500 disabled:opacity-30 disabled:hover:bg-blue-600 text-white px-8 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-xl shadow-blue-500/20 dark:shadow-blue-900/40"
-                  >
-                    {loading ? <Loader2 size={18} className="animate-spin" /> : <>Próximo <ChevronRight size={18} /></>}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSave}
-                    disabled={saved}
-                    className={`px-8 py-2.5 rounded-xl text-sm font-black transition-all flex items-center gap-2 shadow-xl ${
-                      saved ? "bg-green-600 text-white shadow-green-500/20 dark:shadow-green-900/40" : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20 dark:shadow-blue-900/40"
-                    }`}
-                  >
-                    {saved ? <><Check size={18} /> Pronto</> : "Finalizar Setup"}
-                  </button>
-                )}
-              </div>
+                <div className="flex-1 px-4">
+                    {step < 3 ? (
+                        <button
+                            onClick={handleFetchRepos}
+                            disabled={loading || (step === 1 && !settings.pat)}
+                            className="w-full py-4 px-6 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all duration-300 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 disabled:hover:bg-white"
+                        >
+                            {loading ? <Loader2 size={18} className="animate-spin" /> : <>Next <ChevronRight size={16} /></>}
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleSave}
+                            disabled={loading || saved}
+                            className={`w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-sm font-medium transition-all duration-300 ${
+                            saved
+                                ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                                : "bg-white text-black hover:bg-neutral-200"
+                            }`}
+                        >
+                            {loading ? (
+                            <Loader2 size={18} className="animate-spin" />
+                            ) : saved ? (
+                            <>
+                                <Check size={18} strokeWidth={2} /> Configured
+                            </>
+                            ) : (
+                            "Sync Knowledge Base"
+                            )}
+                        </button>
+                    )}
+                </div>
+                 {step > 1 && <div className="w-11" /> /* Spacer to keep button centered */}
+              </motion.div>
+
+              <motion.div
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 transition={{ delay: 0.2 }}
+                 className="mt-8 shrink-0 flex items-center justify-center gap-2 text-xs text-neutral-600 font-sans"
+              >
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+                 Last synced 5 hours ago
+              </motion.div>
             </div>
-          </motion.div>
-        </div>
-      )}
+
+            {/* Toggle Log Button - positioned bottom right of the left column */}
+            <button
+                onClick={() => setShowLog(!showLog)}
+                className={`absolute bottom-6 right-6 p-2 rounded-lg text-neutral-500 hover:text-white transition-all ${showLog ? 'bg-[#222222] text-white' : 'hover:bg-[#1A1A1A]'}`}
+                title="Toggle Sync History"
+            >
+                <GitCommit size={18} strokeWidth={1.5} />
+            </button>
+          </div>
+
+          {/* Right Column: Split-View Log (Collapsible) */}
+          <AnimatePresence>
+            {showLog && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 320, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="border-l border-[#222222] bg-[#141414] flex flex-col overflow-hidden"
+              >
+                <div className="p-6 border-b border-[#222222] flex items-center gap-3">
+                  <Settings2 size={16} className="text-neutral-500" />
+                  <h3 className="text-sm font-medium text-white font-[Outfit]">Sync History</h3>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                  {MOCK_HISTORY.map((entry, idx) => (
+                    <div key={entry.id} className="relative pl-6">
+                      {/* Timeline line */}
+                      {idx !== MOCK_HISTORY.length - 1 && (
+                        <div className="absolute left-1.5 top-5 bottom-[-24px] w-px bg-[#222222]" />
+                      )}
+
+                      {/* Timeline dot */}
+                      <div className={`absolute left-0 top-1 w-3 h-3 rounded-full border-2 border-[#141414] flex items-center justify-center ${
+                         entry.success ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'
+                      }`}>
+                         <div className={`w-1 h-1 rounded-full ${entry.success ? 'bg-green-500' : 'bg-red-500'}`} />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <span className={`text-sm font-sans ${entry.success ? 'text-neutral-300' : 'text-red-400'}`}>
+                          {entry.message}
+                        </span>
+                        <span className="text-xs text-neutral-600 font-sans">
+                          {entry.time} · {entry.type}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
     </AnimatePresence>
   );
 }
