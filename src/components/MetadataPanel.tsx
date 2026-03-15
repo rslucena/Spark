@@ -34,11 +34,11 @@ export function MetadataPanel({
   const isRemote = activeFile.startsWith("remote/");
 
   return (
-    <div className="h-full bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 flex flex-col shadow-2xl overflow-hidden transition-colors">
+    <div className="w-full h-full bg-[#111111] flex flex-col overflow-hidden transition-colors border-l border-[#222222]">
       {/* Header with Sync Button */}
-      <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+      <div className="p-6 border-b border-[#222222] bg-[#111111]">
         <div className="flex items-center justify-between mb-6">
-           <h2 className="text-xs font-black uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500">Metadados</h2>
+           <h2 className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Metadados</h2>
            {isRemote && (
              <button
                onClick={onSync}
@@ -85,7 +85,7 @@ export function MetadataPanel({
               value={localMeta.title}
               onChange={(e) => handleUpdate("title", e.target.value)}
               placeholder="Ex: Guia de Autenticação"
-              className="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors font-medium"
+              className="w-full bg-[#1A1A1A] border border-[#222222] rounded-md px-3 py-2.5 text-sm text-neutral-200 focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-colors outline-none"
             />
           </div>
 
@@ -98,13 +98,13 @@ export function MetadataPanel({
               onChange={(e) => handleUpdate("description", e.target.value)}
               placeholder="Breve descrição do conteúdo..."
               rows={4}
-              className="w-full bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-neutral-900 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors resize-none leading-relaxed"
+              className="w-full bg-[#1A1A1A] border border-[#222222] rounded-md px-3 py-2.5 text-sm text-neutral-200 focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-colors resize-none outline-none leading-relaxed"
             />
           </div>
         </div>
 
         {/* Stats */}
-        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-4">
+        <div className="pt-6 border-t border-[#222222] space-y-4">
           <div className="flex items-center gap-3">
              <div className="p-2 bg-neutral-50 dark:bg-neutral-950 rounded-lg text-neutral-400 dark:text-neutral-600 border border-neutral-100 dark:border-neutral-800">
                 <Calendar size={14} />
@@ -128,7 +128,7 @@ export function MetadataPanel({
       </div>
 
       {/* Footer Info */}
-      <div className="p-6 bg-neutral-50/50 dark:bg-neutral-950/30 border-t border-neutral-200 dark:border-neutral-800 transition-colors">
+      <div className="p-6 bg-[#111111] border-t border-[#222222] transition-colors">
         <div className={`text-[12px] flex items-center gap-2 ${isRemote ? "text-blue-600 dark:text-blue-500/70" : "text-neutral-500"}`}>
           <div className={`w-1.5 h-1.5 rounded-full ${isRemote ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" : "bg-neutral-300 dark:bg-neutral-700"}`} />
           {isRemote ? "Armazenado no GitHub" : "Arquivo Local (Draft)"}

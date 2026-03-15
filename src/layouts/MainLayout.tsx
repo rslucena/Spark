@@ -83,7 +83,7 @@ export function MainLayout({
   const showMetadata = !!activeFilePath;
 
   return (
-    <div className="flex h-screen w-full bg-white dark:bg-[#111111] text-neutral-800 dark:text-neutral-200 font-sans overflow-hidden select-none">
+    <div className="flex h-screen w-full bg-[#111111] text-neutral-200 font-sans overflow-hidden select-none">
       {/* Left Sidebar */}
       <div
         style={{ width: sidebarWidth }}
@@ -110,7 +110,7 @@ export function MainLayout({
       </div>
 
       {/* Main Editor Area */}
-      <main className="flex-1 flex flex-col bg-white dark:bg-[#111111] overflow-hidden relative min-w-0 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.2)]">
+      <main className="flex-1 flex flex-col bg-[#111111] overflow-hidden relative min-w-0">
         <div className="flex-1 overflow-y-hidden select-text">{children}</div>
       </main>
 
@@ -124,7 +124,7 @@ export function MainLayout({
           >
              <div className={`h-full w-px transition-colors duration-200 ${isResizingMetadata ? 'bg-blue-500' : 'bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-400 dark:group-hover:bg-blue-500/50'}`} />
           </div>
-          <div style={{ width: metadataWidth }} className="flex shrink-0 bg-[#fafafa] dark:bg-[#141414] transition-[width] duration-75 ease-out">
+          <div style={{ width: metadataWidth }} className="flex shrink-0 bg-[#111111] transition-[width] duration-75 ease-out border-l border-[#222222]">
             {rightSidePanel}
           </div>
         </>
