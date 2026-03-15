@@ -101,7 +101,7 @@ function SidebarItem({ node, onFileSelect, activeFilePath, forceOpenPaths }: Sid
         {!node.isDirectory && isSelected && (
            <motion.div 
              layoutId="active-indicator"
-             className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+             className="w-1.5 h-1.5 rounded-full bg-neutral-300"
            />
         )}
       </button>
@@ -398,12 +398,6 @@ export function Sidebar({
 
   const { theme, setTheme } = useTheme();
 
-  const toggleTheme = () => {
-    const nextTheme: Record<string, "light" | "dark" | "system"> = {
-      light: "dark",
-      dark: "system",
-      system: "light",
-    };
     setTheme(nextTheme[theme]);
   };
 
@@ -414,23 +408,16 @@ export function Sidebar({
   };
 
   return (
-    <aside className="w-full h-full bg-[#fafafa] dark:bg-[#141414] flex flex-col overflow-hidden transition-colors border-r border-neutral-200/60 dark:border-[#222]">
+    <aside className="w-full h-full bg-[#111111] flex flex-col overflow-hidden transition-colors border-r border-[#222222]">
       {/* Header */}
       <div className="h-14 px-4 flex items-center justify-between shrink-0 group">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-1.5 rounded-md text-white shadow-sm">
-            <Brain size={16} strokeWidth={2.5} />
+        <div className="flex items-center gap-2">
+          <div className="text-neutral-400">
+            <Brain size={16} strokeWidth={2} />
           </div>
-          <h2 className="text-[13px] font-extrabold uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Spark</h2>
+          <h2 className="text-[13px] font-bold text-neutral-200 tracking-wide">Spark</h2>
         </div>
         <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 rounded-md transition-all"
-            title={`Tema: ${theme === "system" ? "Sistema" : theme === "dark" ? "Escuro" : "Claro"}`}
-          >
-            <ThemeIcon />
-          </button>
           <button
             onClick={() => setIsSettingsOpen(true)}
             className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 rounded-md transition-all"
@@ -453,7 +440,7 @@ export function Sidebar({
       <div className="px-3 pb-3 shrink-0">
         <div className="relative group/search">
           <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within/search:text-blue-500 transition-colors z-10">
-            <Search size={14} strokeWidth={2.5} />
+            <Search size={14} strokeWidth={2} />
           </div>
           <input
             ref={searchInputRef}
@@ -461,7 +448,7 @@ export function Sidebar({
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
             placeholder="Search..."
-            className="w-full bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 pl-8 pr-8 text-[13px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none shadow-sm"
+            className="w-full bg-[#1A1A1A] border border-[#222222] rounded-md py-1.5 pl-8 pr-8 text-[13px] text-neutral-200 placeholder:text-neutral-500 focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all outline-none"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {searchQuery ? (
@@ -469,7 +456,7 @@ export function Sidebar({
                 onClick={() => onSearchChange?.("")}
                 className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md text-neutral-400 transition-colors"
               >
-                <X size={12} strokeWidth={2.5} />
+                <X size={12} strokeWidth={2} />
               </button>
             ) : (
               <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-[10px] font-semibold text-neutral-500 border border-neutral-200 dark:border-neutral-700 shadow-sm">
@@ -494,7 +481,7 @@ export function Sidebar({
           <div className="space-y-6 pt-1">
             {fileTree.map((rootNode) => (
               <div key={rootNode.path} className="space-y-1.5">
-                <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+                <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
                   {rootNode.name}
                 </div>
                 <div className="space-y-0.5">

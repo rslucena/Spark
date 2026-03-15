@@ -15,6 +15,7 @@ import { resolveInternalLink } from "./utils/linkResolver";
 import { getSyncSettings } from "./components/SettingsModal";
 import Fuse from "fuse.js";
 import { SearchResultsView } from "./components/SearchResultsView";
+import { EmptyState } from "./components/EmptyState";
 
 interface FileEntry {
   name: string;
@@ -242,11 +243,11 @@ function App() {
           }}
         />
       ) : (
-        <motion.div
+        {!activeFile ? (<EmptyState onNewNote={() => setContent("")} onImportGithub={() => document.querySelector(`[title="Settings"]`)?.click()} onCommandPalette={() => setSearchQuery(" ")} />) : (<div className="flex-1 h-full overflow-y-auto custom-scrollbar pb-32 pt-8"><motion.div
           key={activeFile || "welcome"}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           className="w-full h-full max-w-4xl mx-auto mt-4 px-8"
         >
           {!isTauri() && (
@@ -264,7 +265,7 @@ function App() {
             onChange={handleEditorChange}
             onLinkClick={handleLinkClick}
           />
-        </motion.div>
+        </motion.div></div>)}
       )}
 
       <SyncCommitModal 
