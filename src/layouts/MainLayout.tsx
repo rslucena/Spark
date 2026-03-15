@@ -83,9 +83,12 @@ export function MainLayout({
   const showMetadata = !!activeFilePath;
 
   return (
-    <div className="flex h-screen w-full bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-sans overflow-hidden select-none">
+    <div className="flex h-screen w-full bg-white dark:bg-[#111111] text-neutral-800 dark:text-neutral-200 font-sans overflow-hidden select-none">
       {/* Left Sidebar */}
-      <div style={{ width: sidebarWidth }}>
+      <div
+        style={{ width: sidebarWidth }}
+        className="flex shrink-0 transition-[width] duration-75 ease-out"
+      >
         <Sidebar 
           onFileSelect={onFileSelect} 
           activeFilePath={activeFilePath} 
@@ -101,13 +104,13 @@ export function MainLayout({
       {/* Sidebar Resizer */}
       <div
         onMouseDown={startResizingSidebar}
-        className={`w-px cursor-col-resize hover:bg-blue-500 transition-colors z-10 border-l border-neutral-200 dark:border-neutral-800 ${
-          isResizingSidebar ? "bg-blue-500" : "bg-transparent"
-        }`}
-      />
+        className={`relative w-1 -ml-[0.5px] cursor-col-resize z-20 group flex items-center justify-center transition-colors`}
+      >
+        <div className={`h-full w-px transition-colors duration-200 ${isResizingSidebar ? 'bg-blue-500' : 'bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-400 dark:group-hover:bg-blue-500/50'}`} />
+      </div>
 
       {/* Main Editor Area */}
-      <main className="flex-1 flex flex-col bg-white dark:bg-neutral-900 overflow-hidden relative min-w-0">
+      <main className="flex-1 flex flex-col bg-white dark:bg-[#111111] overflow-hidden relative min-w-0 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.2)]">
         <div className="flex-1 overflow-y-hidden select-text">{children}</div>
       </main>
 
@@ -117,11 +120,11 @@ export function MainLayout({
           {/* Metadata Resizer */}
           <div
             onMouseDown={startResizingMetadata}
-            className={`w-px cursor-col-resize hover:bg-blue-500 transition-colors z-10 border-r border-neutral-200 dark:border-neutral-800 ${
-              isResizingMetadata ? "bg-blue-500" : "bg-transparent"
-            }`}
-          />
-          <div style={{ width: metadataWidth }}>
+            className={`relative w-1 -mr-[0.5px] cursor-col-resize z-20 group flex items-center justify-center transition-colors`}
+          >
+             <div className={`h-full w-px transition-colors duration-200 ${isResizingMetadata ? 'bg-blue-500' : 'bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-400 dark:group-hover:bg-blue-500/50'}`} />
+          </div>
+          <div style={{ width: metadataWidth }} className="flex shrink-0 bg-[#fafafa] dark:bg-[#141414] transition-[width] duration-75 ease-out">
             {rightSidePanel}
           </div>
         </>

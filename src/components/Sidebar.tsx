@@ -414,25 +414,26 @@ export function Sidebar({
   };
 
   return (
-    <aside className="h-full border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 flex flex-col shrink-0 overflow-hidden transition-colors">
-      <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between group">
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-600 dark:bg-blue-500 p-1.5 rounded-lg text-white shadow-lg shadow-blue-500/20">
-            <Brain size={16} />
+    <aside className="w-full h-full bg-[#fafafa] dark:bg-[#141414] flex flex-col overflow-hidden transition-colors border-r border-neutral-200/60 dark:border-[#222]">
+      {/* Header */}
+      <div className="h-14 px-4 flex items-center justify-between shrink-0 group">
+        <div className="flex items-center gap-2.5">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-1.5 rounded-md text-white shadow-sm">
+            <Brain size={16} strokeWidth={2.5} />
           </div>
-          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-neutral-900 dark:text-neutral-200">Spark</h2>
+          <h2 className="text-[13px] font-extrabold uppercase tracking-widest text-neutral-800 dark:text-neutral-200">Spark</h2>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
           <button
             onClick={toggleTheme}
-            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-all"
+            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 rounded-md transition-all"
             title={`Tema: ${theme === "system" ? "Sistema" : theme === "dark" ? "Escuro" : "Claro"}`}
           >
             <ThemeIcon />
           </button>
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-all"
+            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 rounded-md transition-all"
             title="Settings"
           >
             <Settings size={14} />
@@ -440,37 +441,38 @@ export function Sidebar({
           <button
             onClick={handleManualSync}
             disabled={syncStatus === "syncing" || !vaultPath}
-            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-all disabled:opacity-50"
+            className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 rounded-md transition-all disabled:opacity-50"
             title="Sync Vault"
           >
-            <RefreshCw size={14} className={syncStatus === "syncing" ? "animate-spin text-blue-400" : ""} />
+            <RefreshCw size={14} className={syncStatus === "syncing" ? "animate-spin text-blue-500" : ""} />
           </button>
         </div>
       </div>
 
-      <div className="mt-[15px] px-4">
-        <div className="relative group">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-blue-500 transition-colors">
-            <Search size={14} />
+      {/* Search Input */}
+      <div className="px-3 pb-3 shrink-0">
+        <div className="relative group/search">
+          <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within/search:text-blue-500 transition-colors z-10">
+            <Search size={14} strokeWidth={2.5} />
           </div>
           <input
             ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            placeholder="Buscar arquivos ou conteúdo..."
-            className="w-full bg-neutral-100 dark:bg-neutral-900 border-none rounded-xl py-2 pl-9 pr-12 text-[13px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+            placeholder="Search..."
+            className="w-full bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 pl-8 pr-8 text-[13px] text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/10 transition-all outline-none shadow-sm"
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {searchQuery ? (
               <button 
                 onClick={() => onSearchChange?.("")}
-                className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md text-neutral-400 transition-colors"
+                className="p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md text-neutral-400 transition-colors"
               >
-                <X size={12} />
+                <X size={12} strokeWidth={2.5} />
               </button>
             ) : (
-              <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neutral-200/50 dark:bg-neutral-800/50 rounded text-[10px] font-medium text-neutral-500 border border-neutral-300/50 dark:border-neutral-700/50">
+              <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-[10px] font-semibold text-neutral-500 border border-neutral-200 dark:border-neutral-700 shadow-sm">
                 <Command size={10} />
                 <span>K</span>
               </div>
@@ -479,56 +481,81 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar scrollbar-thin">
+      {/* File Tree */}
+      <div className="flex-1 overflow-y-auto px-2 pb-4 custom-scrollbar">
         {error ? (
-          <p className="text-xs text-red-500 p-2">{error}</p>
+          <p className="text-xs text-red-500 p-2 bg-red-50 dark:bg-red-500/10 rounded-lg mx-2">{error}</p>
         ) : fileTree.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2 opacity-40">
-            <Folder size={32} className="text-neutral-500" />
-            <p className="text-xs text-neutral-500">Nenhum arquivo encontrado</p>
+          <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2 opacity-50">
+            <Folder size={28} className="text-neutral-400" strokeWidth={1.5} />
+            <p className="text-[13px] font-medium text-neutral-500">Nenhum arquivo</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6 pt-1">
             {fileTree.map((rootNode) => (
-              <div key={rootNode.path} className="space-y-1">
-                <div className="px-2 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 dark:text-neutral-600 mb-1">
+              <div key={rootNode.path} className="space-y-1.5">
+                <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
                   {rootNode.name}
                 </div>
-                {rootNode.children.map((child) => (
-                  <SidebarItem 
-                    key={child.path} 
-                    node={child} 
-                    onFileSelect={onFileSelect} 
-                    activeFilePath={activeFilePath} 
-                    forceOpenPaths={forceOpenPaths}
-                  />
-                ))}
+                <div className="space-y-0.5">
+                  {rootNode.children.map((child) => (
+                    <SidebarItem
+                      key={child.path}
+                      node={child}
+                      onFileSelect={onFileSelect}
+                      activeFilePath={activeFilePath}
+                      forceOpenPaths={forceOpenPaths}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 transition-colors">
-         <div className={`flex items-center gap-2 text-[12px] font-bold transition-colors ${
-           syncStatus === "error" ? "text-red-400" :
-           syncStatus === "success" ? "text-green-500" :
-           syncStatus === "syncing" ? "text-blue-500" : "text-neutral-400 dark:text-neutral-600"
-         }`}>
-            <div className={`w-1.5 h-1.5 rounded-full transition-all ${
-              syncStatus === "syncing" ? "bg-blue-500 animate-pulse" : 
-              syncStatus === "success" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.3)]" :
-              syncStatus === "error" ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" :
-              "bg-green-500/50"
-            }`} />
-            
-            <span className="truncate">
-              {syncStatus === "syncing" ? "Sincronizando..." : 
-               syncStatus === "success" ? "Tudo Atualizado" : 
-               syncStatus === "error" ? (syncMessage || "Erro no Sync") : 
-               "Conectado"}
-            </span>
-         </div>
+      {/* Footer Sync Status */}
+      <div className="border-t border-neutral-200/60 dark:border-neutral-800/60 bg-white dark:bg-transparent shrink-0">
+        {githubRepo && (
+          <div className="px-3 py-2 border-b border-neutral-200/40 dark:border-neutral-800/40 flex items-center justify-between text-[11px] font-medium text-neutral-500 dark:text-neutral-400 bg-neutral-50/50 dark:bg-neutral-900/20">
+            <div className="flex items-center gap-1.5 truncate">
+              {githubUser ? (
+                <img src={githubUser.avatar_url} alt={githubUser.login} className="w-4 h-4 rounded-full bg-neutral-200 dark:bg-neutral-800" />
+              ) : (
+                <Folder size={12} />
+              )}
+              <span className="truncate" title={githubRepo}>{githubRepo}</span>
+            </div>
+            {githubBranch && (
+              <div className="flex items-center gap-1 shrink-0 bg-neutral-200/50 dark:bg-neutral-800/50 px-1.5 py-0.5 rounded text-[10px] text-neutral-600 dark:text-neutral-300">
+                <GitBranch size={10} />
+                <span className="max-w-[60px] truncate">{githubBranch}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="p-3">
+          <div className={`flex items-center gap-2 text-[12px] font-semibold transition-colors ${
+            syncStatus === "error" ? "text-red-500" :
+            syncStatus === "success" ? "text-green-600 dark:text-green-500" :
+            syncStatus === "syncing" ? "text-blue-500" : "text-neutral-500"
+          }`}>
+             <div className={`w-2 h-2 rounded-full transition-all ${
+               syncStatus === "syncing" ? "bg-blue-500 animate-pulse" :
+               syncStatus === "success" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" :
+               syncStatus === "error" ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" :
+               "bg-neutral-300 dark:bg-neutral-600"
+             }`} />
+
+             <span className="truncate">
+               {syncStatus === "syncing" ? "Sincronizando..." :
+                syncStatus === "success" ? "Sincronizado" :
+                syncStatus === "error" ? (syncMessage || "Não sincronizado") :
+                "Pronto"}
+             </span>
+          </div>
+        </div>
       </div>
 
       <SettingsModal
