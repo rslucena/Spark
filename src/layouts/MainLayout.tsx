@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { SyncStatus } from "../hooks/useSync";
+import { FileEntry } from "../types";
 
 export function MainLayout({
   children,
@@ -27,7 +28,7 @@ export function MainLayout({
   syncMessage?: string;
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
-  onFilesLoaded?: (files: any[]) => void;
+  onFilesLoaded?: (files: FileEntry[]) => void;
 }) {
   const [sidebarWidth, setSidebarWidth] = useState(260);
   const [metadataWidth, setMetadataWidth] = useState(320);

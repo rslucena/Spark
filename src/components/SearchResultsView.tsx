@@ -1,12 +1,6 @@
 import { motion } from "framer-motion";
 import { FileText, Search } from "lucide-react";
-
-interface FileEntry {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  content?: string;
-}
+import { FileEntry } from "../types";
 
 interface SearchResultsViewProps {
   query: string;

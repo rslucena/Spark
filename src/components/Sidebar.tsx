@@ -21,18 +21,12 @@ import * as tauriCore from "@tauri-apps/api/core";
 import { motion, AnimatePresence } from "framer-motion";
 import { SettingsModal, getSyncSettings } from "./SettingsModal";
 import { MOCK_FILES } from "../utils/mockData";
+import { FileEntry } from "../types";
 
 const invoke = tauriCore && (tauriCore as any).invoke ? (tauriCore as any).invoke : null;
 
 function isTauri() {
   return !!(window as any).__TAURI_INTERNALS__;
-}
-
-interface FileEntry {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  content?: string;
 }
 
 interface FileNode extends FileEntry {

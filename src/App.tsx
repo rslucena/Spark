@@ -15,13 +15,7 @@ import { resolveInternalLink } from "./utils/linkResolver";
 import { getSyncSettings } from "./components/SettingsModal";
 import Fuse from "fuse.js";
 import { SearchResultsView } from "./components/SearchResultsView";
-
-interface FileEntry {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  content?: string;
-}
+import { FileEntry } from "./types";
 
 const INITIAL_CONTENT = `# Welcome to Spark
 A local-first knowledge management application.
