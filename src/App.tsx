@@ -243,7 +243,7 @@ function App() {
           }}
         />
       ) : (
-        {!activeFile ? (<EmptyState onNewNote={() => setContent("")} onImportGithub={() => document.querySelector(`[title="Settings"]`)?.click()} onCommandPalette={() => setSearchQuery(" ")} />) : (<div className="flex-1 h-full overflow-y-auto custom-scrollbar pb-32 pt-8"><motion.div
+        !activeFile ? (<EmptyState onNewNote={() => setContent("")} onImportGithub={() => ((document.querySelector(`[title="Settings"]`) as HTMLElement))?.click()} onCommandPalette={() => setSearchQuery(" ")} />) : (<div className="flex-1 h-full overflow-y-auto custom-scrollbar pb-32 pt-8"><motion.div
           key={activeFile || "welcome"}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
@@ -265,7 +265,7 @@ function App() {
             onChange={handleEditorChange}
             onLinkClick={handleLinkClick}
           />
-        </motion.div></div>)}
+        </motion.div></div>)
       )}
 
       <SyncCommitModal 
